@@ -1,4 +1,4 @@
 aiogram
 python-dotenv
 motor
-pymongo
+pymongo[srv]
