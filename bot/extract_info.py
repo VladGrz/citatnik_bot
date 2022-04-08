@@ -1,16 +1,12 @@
-def extract_user_info(message=None, call=None):
-    if message:
-        user_id = message.from_user.id
-        first_name = message.from_user.first_name
-        last_name = message.from_user.last_name
-        username = message.from_user.username
-        return user_id, first_name, last_name, username
-    else:
-        user_id = call.from_user.id
-        first_name = call.from_user.first_name
-        last_name = call.from_user.last_name
-        username = call.from_user.username
-        return user_id, first_name, last_name, username
+def extract_user_info(message=None):
+    user_id = message.from_user.id
+    first_name = message.from_user.first_name
+    last_name = message.from_user.last_name
+    username = message.from_user.username
+    return {'user_id': user_id,
+            'first_name': first_name,
+            'last_name': last_name,
+            'username': username}
 
 
 def extract_file_info(message=None, call=None):

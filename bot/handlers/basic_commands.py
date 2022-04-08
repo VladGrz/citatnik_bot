@@ -10,11 +10,7 @@ from bot.extract_info import extract_user_info
 
 @dp.message_handler(commands=['start'])
 async def greeting(message: Message):
-    values = extract_user_info(message=message)
-    new_user = await reg_user(user_id=values[0],
-                              first_name=values[1],
-                              last_name=values[2],
-                              username=values[3])
+    new_user = await reg_user(message=message)
     message_text = "Привіт! Можу зробити аудіо-цитатку з твого файлу) " \
                    "Для детальної інформації як я працюю напиши /help.\n\n"
     await message.answer(

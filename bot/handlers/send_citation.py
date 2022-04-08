@@ -4,8 +4,9 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, \
 
 from loader import bot, dp
 
-from data.database import get_citation, get_user_citat_list
+from data.database import get_citation, get_user_citat_list, update_all
 
+from bot.keyboards.like_dislike_kb import form_like_dislike_kb
 
 # from bot.states.add_citation import AddingCitation
 
@@ -20,6 +21,7 @@ num_emojis = {1: '1️⃣',
               9: '9️⃣',
               10: '🔟'}
 
+
 @dp.message_handler(commands="citata", state='*')
 async def form_citation_list(message: Message):
     citat_list = await get_user_citat_list(message.from_user.id)
@@ -28,7 +30,7 @@ async def form_citation_list(message: Message):
     print(name)
     msg_text = "Яку цитату бажаєте відправити?\n"
     kb = [InlineKeyboardButton(text=f'⬅️',
-                                       callback_data=f'back')]
+                               callback_data=f'back')]
     for i, key in enumerate(name):
         msg_text += f"{i + 1}. {key};\n"
         kb.append(InlineKeyboardButton(text=f'{num_emojis[i + 1]}',
@@ -39,13 +41,23 @@ async def form_citation_list(message: Message):
     await message.reply(msg_text, reply_markup=keyboard)
 
 
-@dp.callback_query_handler(text_contains='citat')
+@dp.callback_query_handler(text_contains='citat', state='*')
 async def send_citation(call: CallbackQuery):
-    await call.answer()
-    file_id, file_type = await get_citation(call.from_user.id, call.data.split(":")[1])
-    print(file_id, file_type)
-    if 'mpeg' in file_type:
-        print('trying')
-        await call.message.answer_audio(file_id)
-    elif 'ogg' in file_type:
-        await call.message.answer_voice(file_id)
+    doc_id = call.data.split(":")[1]
+    file_id, file_type, file_name = await get_citation(call.from_user.id,
+                                                       doc_id)
+
+    if file_id == 'private':
+        await call.answer(text="Власник заборонив доступ до своїх цитат",
+                          show_alert=True)
+    elif file_id is None:
+        await call.answer(text="Не вдалось знайти цитату", show_alert=True)
+    else:
+        likes_kb = await form_like_dislike_kb(doc_id)
+        if 'mpeg' in file_type:
+            print('trying')
+            await call.message.answer_audio(file_id,
+                                            reply_markup=likes_kb)
+        elif 'ogg' in file_type:
+            await call.message.answer_voice(file_id)
+        await call.answer(text="Цитату надіслано")
