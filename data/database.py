@@ -87,7 +87,16 @@ async def get_user_citat_list(user_id):
     citat_list = users_citation["all_citations"]
     result = {}
     async for citation in citat_list.find({'user_id': user_id},
-                                          sort=[('uses_count', -1)]):
+                                          sort=[('usage_count', -1)]):
+        result.update({citation['file_name']: citation['_id']})
+    return result
+
+
+async def get_global_citat_list():
+    citat_list = users_citation["all_citations"]
+    result = {}
+    async for citation in citat_list.find({'private': False},
+                                          sort=[('usage_count', -1)]):
         result.update({citation['file_name']: citation['_id']})
     return result
 
@@ -141,7 +150,6 @@ async def change_dislikes_count(user_id, doc_id, step):
 async def user_reaction(message, doc_id):
     new_user = await reg_user(message)
     user_id = message.from_user.id
-    reaction = False
     if new_user:
         like = False
     else:
@@ -155,3 +163,18 @@ async def user_reaction(message, doc_id):
         else:
             like = False
     return like
+
+
+async def get_user_private_setting(user_id):
+    user = await user_list.find_one({'user_id': user_id})
+    return user['private']
+
+
+async def change_user_private_setting(user_id):
+    citat_list = users_citation["all_citations"]
+    privacy = await get_user_private_setting(user_id)
+    await citat_list.update_many({'user_id': user_id},
+                                 {'$set': {'private': not privacy}})
+    await user_list.update_one({'user_id': user_id},
+                                 {'$set': {'private': not privacy}})
+    return not privacy
