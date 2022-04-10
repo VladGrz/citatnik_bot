@@ -41,6 +41,9 @@ async def add_citation(msg, file_name):
     chat_id, message_id, user_id, file_type, file_id, file_unique_id = extract_file_info(
         message=msg)
     citations = users_citation["all_citations"]
+    privacy = await get_user_private_setting(user_id)
+    if privacy is None:
+        await reg_user(msg)
     credentials = {
         'file_name': file_name,
         'file_type': file_type,
@@ -52,7 +55,7 @@ async def add_citation(msg, file_name):
         'usage_count': 0,
         'likes': 0,
         'dislikes': 0,
-        'private': True
+        'private': privacy
     }
     await citations.insert_one(credentials)
 
@@ -116,7 +119,8 @@ async def change_likes_count(user_id, doc_id, step):
     citat_list = users_citation["all_citations"]
     await citat_list.update_one({'_id': ObjectId(doc_id)},
                                 {'$inc': {'likes': step}})
-    liked_citations = (await user_list.find_one({'user_id': user_id}))['user_liked']
+    liked_citations = (await user_list.find_one({'user_id': user_id}))[
+        'user_liked']
     if step > 0:
         liked_citations.append(doc_id)
         await user_list.update_one({'user_id': user_id},
@@ -167,7 +171,10 @@ async def user_reaction(message, doc_id):
 
 async def get_user_private_setting(user_id):
     user = await user_list.find_one({'user_id': user_id})
-    return user['private']
+    try:
+        return user['private']
+    except:
+        return None
 
 
 async def change_user_private_setting(user_id):
@@ -176,5 +183,11 @@ async def change_user_private_setting(user_id):
     await citat_list.update_many({'user_id': user_id},
                                  {'$set': {'private': not privacy}})
     await user_list.update_one({'user_id': user_id},
-                                 {'$set': {'private': not privacy}})
+                               {'$set': {'private': not privacy}})
     return not privacy
+
+
+async def delete_user_citation(citation_id):
+    citat_list = users_citation["all_citations"]
+    await citat_list.delete_one({'_id': ObjectId(citation_id)})
+    return
