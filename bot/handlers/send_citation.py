@@ -14,6 +14,7 @@ from bot.filters.filters import AccessFilter
 
 @dp.callback_query_handler(text_startswith='back_to:', state="*")
 async def users_choice_citats_list(call: CallbackQuery):
+    await call.answer()
     await call.message.edit_text("Цитату з якого списку бажаєте відправити?",
                                  reply_markup=users_choice_kb)
 
@@ -37,13 +38,16 @@ async def form_citation_list(call: CallbackQuery):
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard.citations_keyboard)
     await call.message.edit_text(keyboard.message_text,
                                  reply_markup=markup)
+    await call.answer()
 
 
 @dp.callback_query_handler(text_startswith='page:', access=True, state='*')
 async def change_page(call: CallbackQuery):
     await call.answer()
     calldata = call.data.split(":")
-    purpose = call.message.reply_markup.inline_keyboard[0][0]['callback_data'].split(':')[0]
+    purpose = \
+    call.message.reply_markup.inline_keyboard[0][0]['callback_data'].split(
+        ':')[0]
     user_id = int(calldata[3])
     list_type = calldata[2]
     page_start, page_end = calldata[1].split("-")
@@ -61,16 +65,13 @@ async def change_page(call: CallbackQuery):
                                  reply_markup=markup)
 
 
-@dp.callback_query_handler(text_contains='send_citation', access=True, state='*')
+@dp.callback_query_handler(text_contains='send_citation', access=True,
+                           state='*')
 async def send_citation(call: CallbackQuery):
     doc_id = call.data.split(":")[1]
     file_id, file_type, file_name = await get_citation(call.from_user.id,
                                                        doc_id)
-
-    if file_id == 'private':
-        await call.answer(text="Власник заборонив доступ до своїх цитат",
-                          show_alert=True)
-    elif file_id is None:
+    if file_id is None:
         await call.answer(text="Не вдалось знайти цитату             🔍❌\n"
                                "Можливо користувач її видалив ✉️➡️🗑",
                           show_alert=True)

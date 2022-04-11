@@ -7,6 +7,7 @@ from loader import bot, dp
 from data.database import add_citation
 
 from bot.states.add_citation import AddingCitation
+from bot.keyboards.add_citation_kb import add_or_cancel_adding_kb
 
 
 @dp.message_handler(commands=['new'], state='*')
@@ -29,9 +30,13 @@ async def file_name(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(file_name=name)
     data = await state.get_data()
-
     await add_citation(data['file'], data['file_name'])
     await state.finish()
-    await message.answer("Успішно додав аудіоцитату")
+    await message.answer("Успішно додав аудіоцитату",
+                         reply_markup=add_or_cancel_adding_kb)
 
 
+@dp.callback_query_handler(text='continue')
+async def stop_adding(call: CallbackQuery):
+    await call.answer()
+    await add_new_citation(call.message)
