@@ -29,7 +29,8 @@ async def reg_user(message, private=True):
             'user_tag': info['username'],
             'user_liked': [],
             'user_disliked': [],
-            'private': private
+            'private': private,
+            'sort_key': 'data'
         }
         await user_list.insert_one(credentials)
         return user_list
@@ -75,6 +76,32 @@ async def increase_usages(citations_list, citation_id):
                                     {'$inc': {'usage_count': 1}})
 
 
+async def get_user_sort(user_id):
+    user = await user_list.find_one({'user_id': user_id})
+    try:
+        return user['sort_key']
+    except KeyError:
+        await user_list.update_one({'user_id': user_id},
+                                   {'$set': {'sort_key': 'data'}})
+        return 'data'
+    except TypeError:
+        return 'data'
+
+
+async def change_user_sort(user_id):
+    sort_types = ['data', 'usage_count', 'likes', 'dislikes']
+    user = await user_list.find_one({'user_id': user_id})
+    try:
+        next_sort = sort_types.index(user['sort_key']) + 1
+    except TypeError:
+        return False
+    if next_sort == len(sort_types):
+        next_sort = 0
+    await user_list.update_one({'user_id': user_id},
+                               {'$set': {'sort_key': sort_types[next_sort]}})
+    return sort_types[next_sort]
+
+
 async def get_citation(user_id, citation_id):
     citation = users_citation["all_citations"]
     result = await citation.find_one({'_id': ObjectId(citation_id)})
@@ -89,17 +116,19 @@ async def get_citation(user_id, citation_id):
 async def get_user_citat_list(user_id):
     citat_list = users_citation["all_citations"]
     result = {}
+    sort_by = await get_user_sort(user_id)
     async for citation in citat_list.find({'user_id': user_id},
-                                          sort=[('usage_count', -1)]):
+                                          sort=[(sort_by, -1)]):
         result.update({citation['file_name']: citation['_id']})
     return result
 
 
-async def get_global_citat_list():
+async def get_global_citat_list(user_id):
     citat_list = users_citation["all_citations"]
     result = {}
+    sort_by = await get_user_sort(user_id)
     async for citation in citat_list.find({'private': False},
-                                          sort=[('usage_count', -1)]):
+                                          sort=[(sort_by, -1)]):
         result.update({citation['file_name']: citation['_id']})
     return result
 
@@ -180,6 +209,8 @@ async def get_user_private_setting(user_id):
 async def change_user_private_setting(user_id):
     citat_list = users_citation["all_citations"]
     privacy = await get_user_private_setting(user_id)
+    if privacy is None:
+        return None
     await citat_list.update_many({'user_id': user_id},
                                  {'$set': {'private': not privacy}})
     await user_list.update_one({'user_id': user_id},

@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 from loader import dp
 
 from data.database import get_citation, get_user_citat_list, \
-    delete_user_citation
+    delete_user_citation, get_user_sort
 
 from bot.keyboards.citations_kb import CitationKeyboard
 from bot.filters.filters import AccessFilter
@@ -12,7 +12,9 @@ from bot.filters.filters import AccessFilter
 @dp.message_handler(commands='delete_citation', state='*')
 async def form_citation_list(message: Message):
     citat_list = await get_user_citat_list(message.from_user.id)
+    sort_by = await get_user_sort(message.from_user.id)
     keyboard = CitationKeyboard(citat_list,
+                                sort_type=sort_by,
                                 list_type='private_list',
                                 purpose='delete',
                                 user_id=message.from_user.id)
@@ -38,7 +40,9 @@ async def delete_citation(call: CallbackQuery):
     await call.answer(f'Вашу цитату: "{file_name}", видалено.',
                       show_alert=True)
     citat_list = await get_user_citat_list(user_id)
+    sort_by = await get_user_sort(call.from_user.id)
     keyboard = CitationKeyboard(citat_list,
+                                sort_type=sort_by,
                                 list_type='private_list',
                                 purpose='delete',
                                 user_id=user_id,

@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 from loader import bot, dp
 
 from data.database import get_citation, get_user_citat_list, \
-    get_global_citat_list
+    get_global_citat_list, get_user_sort
 
 from bot.keyboards.like_dislike_kb import form_like_dislike_kb
 from bot.keyboards.users_choice_kb import users_choice_kb
@@ -29,11 +29,13 @@ async def users_choice_citats_list(message: Message):
 async def form_citation_list(call: CallbackQuery):
     list_type = call.data.split(":")[1]
     if list_type == 'global_list':
-        citat_list = await get_global_citat_list()
+        citat_list = await get_global_citat_list(call.from_user.id)
     else:
         citat_list = await get_user_citat_list(call.from_user.id)
+    sort_by = await get_user_sort(call.from_user.id)
     keyboard = CitationKeyboard(citat_list,
                                 list_type,
+                                sort_type=sort_by,
                                 user_id=call.from_user.id)
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard.citations_keyboard)
     await call.message.edit_text(keyboard.message_text,
@@ -45,18 +47,20 @@ async def form_citation_list(call: CallbackQuery):
 async def change_page(call: CallbackQuery):
     await call.answer()
     calldata = call.data.split(":")
-    purpose = \
-    call.message.reply_markup.inline_keyboard[0][0]['callback_data'].split(
-        ':')[0]
+    purpose = (
+        call.message.reply_markup.inline_keyboard[0][0]['callback_data'].split(
+            ':')[0])
     user_id = int(calldata[3])
     list_type = calldata[2]
     page_start, page_end = calldata[1].split("-")
     if list_type == 'global_list':
-        citat_list = await get_global_citat_list()
+        citat_list = await get_global_citat_list(call.from_user.id)
     else:
         citat_list = await get_user_citat_list(user_id)
+    sort_by = await get_user_sort(user_id)
     keyboard = CitationKeyboard(citat_list,
                                 list_type,
+                                sort_type=sort_by,
                                 purpose=purpose.split("_")[0],
                                 user_id=user_id,
                                 start=int(page_start))

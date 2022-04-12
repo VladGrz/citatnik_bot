@@ -3,7 +3,7 @@ from aiogram.utils.exceptions import MessageNotModified
 
 from loader import bot, dp
 from bot.keyboards.settings_kb import user_pivacy_kb
-from data.database import change_user_private_setting
+from data.database import change_user_private_setting, reg_user
 
 privat = {
     True: "приватні",
@@ -30,6 +30,9 @@ async def change_privacy(call: CallbackQuery):
     user = int(call.data.split(':')[1])
     if user == call.from_user.id:
         privacy = await change_user_private_setting(call.from_user.id)
+        if privacy is None:
+            await reg_user(call)
+            privacy = True
         try:
             await call.message.edit_reply_markup(
                 await user_pivacy_kb(call.from_user.id)

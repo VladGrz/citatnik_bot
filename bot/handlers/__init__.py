@@ -5,5 +5,6 @@ from .inc_dec_likes_dislikes import bot, dp
 from .settings import bot, dp
 from .delete_citation import dp
 from .error_catcher import bot, dp
+from .change_sort_type import dp
 
 __all__ = ["dp", "bot"]

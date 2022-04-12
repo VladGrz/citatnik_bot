@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from data.database import get_user_sort
 
 # кнопки вибору цитати
 """ 
@@ -6,27 +7,6 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 базово на 1 сторінці відображається вьсого 5 цитат, тому ці кнопки 
     будуть перемикати між набором цитат
 """
-# basic_structure = [
-#     [
-#     ],
-#     [
-#     ],
-#     [
-#         InlineKeyboardButton("Назад↩️",
-#                              callback_data="back_to:user_list_choice")
-#     ],
-# ]
-
-num_emojis = {1: '1️⃣',
-              2: '2️⃣',
-              3: '3️⃣',
-              4: '4️⃣',
-              5: '5️⃣',
-              6: '6️⃣',
-              7: '7️⃣',
-              8: '8️⃣',
-              9: '9️⃣',
-              0: '0️⃣'}
 
 
 # def form_num_from_emojis(num):
@@ -112,17 +92,22 @@ class CitationKeyboard:
     ]
     num_emojis = {1: '1️⃣', 2: '2️⃣', 3: '3️⃣', 4: '4️⃣', 5: '5️⃣', 6: '6️⃣',
                   7: '7️⃣', 8: '8️⃣', 9: '9️⃣', 0: '0️⃣'}
+    sort_names = {'data': 'датою додання',
+                  'usage_count': 'кількістю використань',
+                  'likes': 'лайками',
+                  'dislikes': 'дизлайками'}
     send_citation = "Яку цитату бажаєте відправити?  📨\n\n"
     delete_citation = "Яку цитату бажаєте видалити?  🗑\n\n"
 
-    def __init__(self, citat_list, list_type, user_id, purpose='send',
-                 start=None, end=None):
+    def __init__(self, citat_list, list_type, user_id, sort_type,
+                 purpose='send', start=None, end=None):
         self.citations_keyboard = [i.copy() for i in self.basic_structure]
         self.start = 0 if start is None else start - 1
         self.end = self.start + 6 if end is None else end + 1
         self.citat_list = citat_list
         self.keys_list = list(citat_list.keys())
         self.titles_list = list(citat_list.keys())[self.start:self.end]
+        self.sort_by = self.sort_names[sort_type]
         self.button_texts = self.form_page_buttons_text()
         if purpose == 'send':
             self.message_text = self.send_citation
@@ -130,15 +115,19 @@ class CitationKeyboard:
         else:
             self.message_text = self.delete_citation
             self.callback_purpose = 'delete_citation'
-            self.citations_keyboard.pop(2)
+            self.citations_keyboard[2].pop(0)
+        self.message_text += f'Відсортовано за {self.sort_by}\n\n'
         if len(citat_list) == 0:
-            self.message_text += 'Упс, здається в цьому списку немає цитат. '\
+            self.message_text += 'Упс, здається в цьому списку немає цитат. ' \
                                  'Напишіть /new щоб додати цитату'
+        else:
+            self.citations_keyboard.insert(2, [InlineKeyboardButton(
+                text=f'Сортування за {self.sort_by}',
+                callback_data=f'sort_by:{sort_type}:{user_id}')])
         self.list_type = list_type
         self.user_id = user_id
         self.form_page_buttons()
         self.form_message_text_and_buttons()
-
 
     def form_page_buttons_text(self):
         list_len = len(self.keys_list)

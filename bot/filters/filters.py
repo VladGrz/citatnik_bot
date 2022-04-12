@@ -29,6 +29,11 @@ class AccessFilter(BoundFilter):
                 "у зв'язку з налаштуваннями користувача.🤷‍♂️",
                 show_alert=True)
             return False
+        elif user_clicked == 'sort_by':
+            await call.answer(
+                "Ви не можете змінити тип сортування іншої людини 😜",
+                show_alert=True)
+            return False
         elif call_purpose == 'delete_citation':
             await call.answer(
                 "Ви не можете видаляти чужі цитати😡",
