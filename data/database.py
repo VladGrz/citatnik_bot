@@ -116,21 +116,25 @@ async def get_citation(user_id, citation_id):
 async def get_user_citat_list(user_id):
     citat_list = users_citation["all_citations"]
     result = {}
+    all_citats = []
     sort_by = await get_user_sort(user_id)
     async for citation in citat_list.find({'user_id': user_id},
                                           sort=[(sort_by, -1)]):
         result.update({citation['file_name']: citation['_id']})
-    return result
+        all_citats.append(citation)
+    return all_citats
 
 
 async def get_global_citat_list(user_id):
     citat_list = users_citation["all_citations"]
     result = {}
+    all_citats = []
     sort_by = await get_user_sort(user_id)
     async for citation in citat_list.find({'private': False},
                                           sort=[(sort_by, -1)]):
         result.update({citation['file_name']: citation['_id']})
-    return result
+        all_citats.append(citation)
+    return all_citats
 
 
 async def update_all(user_id):
