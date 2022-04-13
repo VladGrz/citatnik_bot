@@ -80,13 +80,18 @@ async def send_citation(call: CallbackQuery):
                                "Можливо користувач її видалив ✉️➡️🗑",
                           show_alert=True)
     else:
+        first_name = call.from_user.first_name
+        last_name = call.from_user.last_name
+        sent_by = (('' if first_name is None else first_name)
+                   + ' '
+                   + '' if last_name is None else last_name)
         likes_kb = await form_like_dislike_kb(doc_id)
         if 'mpeg' in file_type:
             await call.message.answer_audio(file_id,
-                                            caption=file_name,
+                                            caption=f"{file_name}\nSent by {sent_by}",
                                             reply_markup=likes_kb)
         elif 'ogg' in file_type:
             await call.message.answer_voice(file_id,
-                                            caption=file_name,
+                                            caption=f"{file_name}\nSent by {sent_by}",
                                             reply_markup=likes_kb)
         await call.answer(text="Цитату надіслано")

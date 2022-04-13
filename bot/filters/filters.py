@@ -21,10 +21,8 @@ class AccessFilter(BoundFilter):
         call_purpose = keys[0]
         owner_request = user_id == call.from_user.id
         user_private_status = await get_user_private_setting(user_id)
-        print(user_clicked)
         strict_access = (
                     user_clicked != 'delete_citation' or user_clicked != 'sort_by')
-        print(strict_access)
         if owner_request or (
                 not user_private_status and not strict_access):
             return True
