@@ -59,5 +59,6 @@ async def search_result(query: InlineQuery):
             )
     print(await query.answer(audio_result,
                              cache_time=1,
+                             is_personal=True, 
                              switch_pm_text="Додати цитату",
                              switch_pm_parameter='add'))
