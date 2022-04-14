@@ -18,7 +18,7 @@ async def search_result(query: InlineQuery):
             search = query.query.lower()[7:].lstrip()
         except IndexError:
             search = ''
-        citations = await get_global_citat_list(search)
+        citations = await get_global_citat_list(query.from_user.id, search)
     else:
         search = query.query.lower()
         citations = await get_user_citat_list(query.from_user.id, search)
