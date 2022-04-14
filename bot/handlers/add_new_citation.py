@@ -1,6 +1,7 @@
 import asyncio
 
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
 from loader import bot, dp
 
@@ -11,6 +12,7 @@ from bot.keyboards.add_citation_kb import add_or_cancel_adding_kb
 
 
 @dp.message_handler(commands=['new'], state='*')
+@dp.message_handler(CommandStart(deep_link="add"), state='*')
 async def add_new_citation(message: Message):
     await message.answer("Надішліть мені аудіо/голосовий файл.")
     await AddingCitation.citation_file.set()

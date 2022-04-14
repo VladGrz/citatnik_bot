@@ -1,7 +1,9 @@
 import asyncio
+import re
+
 import motor.motor_asyncio
 
-from bson import ObjectId
+from bson import ObjectId, Regex
 
 from data.config import MONGO_CLIENT
 from bot.extract_info import extract_file_info, extract_user_info
@@ -113,26 +115,32 @@ async def get_citation(user_id, citation_id):
     return result['file_id'], result['file_type'], result['file_name']
 
 
-async def get_user_citat_list(user_id):
+async def get_user_citat_list(user_id, starts_with=''):
     citat_list = users_citation["all_citations"]
-    result = {}
+    pattern = re.compile(f'^{starts_with}', re.I)
+    regex = Regex.from_native(pattern)
+    regex.flags ^= re.UNICODE
     all_citats = []
     sort_by = await get_user_sort(user_id)
-    async for citation in citat_list.find({'user_id': user_id},
+    async for citation in citat_list.find({'user_id': user_id,
+                                           'file_name': {
+                                              '$regex': regex}
+                                           },
                                           sort=[(sort_by, -1)]):
-        result.update({citation['file_name']: citation['_id']})
         all_citats.append(citation)
     return all_citats
 
 
-async def get_global_citat_list(user_id):
+async def get_global_citat_list(user_id, starts_with=''):
     citat_list = users_citation["all_citations"]
-    result = {}
+    pattern = re.compile(f'^{starts_with}', re.I)
+    regex = Regex.from_native(pattern)
+    regex.flags ^= re.UNICODE
     all_citats = []
     sort_by = await get_user_sort(user_id)
-    async for citation in citat_list.find({'private': False},
+    async for citation in citat_list.find({'file_name': {'$regex': regex},
+                                           'private': False},
                                           sort=[(sort_by, -1)]):
-        result.update({citation['file_name']: citation['_id']})
         all_citats.append(citation)
     return all_citats
 
