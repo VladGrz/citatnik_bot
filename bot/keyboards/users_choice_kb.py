@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+""" Keyboard to chose list of citations(private or global). """
 users_choice_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [

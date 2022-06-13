@@ -1,4 +1,5 @@
 def extract_user_info(message=None):
+    """ Extract info about User from message. """
     user_id = message.from_user.id
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
@@ -10,6 +11,7 @@ def extract_user_info(message=None):
 
 
 def extract_file_info(message=None, call=None):
+    """ Extract info about file. """
     msg_id = message.message_id
     cht_id = message.chat.id
     usr_id = message.from_user.id
