@@ -9,8 +9,12 @@ from bot.keyboards.citations_kb import CitationKeyboard
 
 
 @dp.callback_query_handler(text_startswith='sort_by', access=True)
-async def change_sort_type(call:CallbackQuery):
+async def change_sort_type(call: CallbackQuery):
+    """ Catching user`s desire to change sort type. """
+
     sort_by = await change_user_sort(call.from_user.id)
+
+    # If user is new we should ask him to send us /start message to register him
     if not sort_by:
         await call.answer("Упс, щось я вас не впізнаю, напишіть /start "
                           "щоб ми познайомились😉", show_alert=True)
@@ -22,6 +26,8 @@ async def change_sort_type(call:CallbackQuery):
         citat_list = await get_global_citat_list(call.from_user.id)
     else:
         citat_list = await get_user_citat_list(call.from_user.id)
+
+    # Checking the purpose to specify it in new message and keyboard
     purpose = (
         call.message.reply_markup.inline_keyboard[0][0]['callback_data'].split(
             ':')[0])

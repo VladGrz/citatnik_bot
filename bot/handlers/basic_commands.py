@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram.types import Message
 
-from loader import bot, dp
+from loader import dp
 from data.database import reg_user
 
 from bot.extract_info import extract_user_info
@@ -10,6 +10,8 @@ from bot.extract_info import extract_user_info
 
 @dp.message_handler(commands=['start'])
 async def greeting(message: Message):
+    """ Catching `/start` command. """
+
     new_user = await reg_user(message=message)
     message_text = "Привіт! Можу зробити аудіо-цитатку з твого файлу) " \
                    "Для детальної інформації як я працюю напиши /help.\n\n"
@@ -28,6 +30,8 @@ async def greeting(message: Message):
 
 @dp.message_handler(commands=['help'])
 async def help(message: Message):
+    """ Catching `/help` command. """
+
     message_text = (
         "Я можу зберегти ваші медіацитатки. Для початку роботи "
         "напишіть мені команду /citation далі слідуйте інструкціям."
@@ -55,7 +59,8 @@ async def help(message: Message):
 
 @dp.message_handler(commands=['commands'])
 async def commands(message: Message):
-    # '/cut - обрізати медіа\n'
+    """ Catching `/commands` command. """
+
     await message.answer(text='/start - початок роботи\n'
                               '/help - допомога\n'
                               '/settings - налаштування\n'
