@@ -12,7 +12,7 @@ from bot.keyboards.like_dislike_kb import form_like_dislike_kb
 
 @dp.inline_handler()
 async def search_result(query: InlineQuery):
-    """ Catches inline request from user"""
+    """ Catches inline request from user. """
 
     # If user specifies '-global' parameter after bot`s tag we have to show
     # global citations list
@@ -79,6 +79,9 @@ async def search_result(query: InlineQuery):
     # cache time variable says how long after using bot it will remember the result
     # in our case it`s better to set it as 1, to form new list every time
     # when user request this menu
+
+    # Switch parameter and text defines text of the inline button
+    # and command which will be transferred to bot
     await query.answer(audio_result,
                        cache_time=1,
                        is_personal=True,

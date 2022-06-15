@@ -87,7 +87,7 @@ async def change_page(call: CallbackQuery):
                                  reply_markup=markup)
 
 
-@dp.callback_query_handler(text_contains='send_citation', access=True,
+@dp.callback_query_handler(text_startswith='send_citation', access=True,
                            state='*')
 async def send_citation(call: CallbackQuery):
     """ Catching user`s desire to send citation. """
