@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery, InlineKeyboardButton, \
     InlineKeyboardMarkup
 
-from loader import dp
+from loader import bot, dp
 
 from data.database import user_reaction, change_likes_count, \
     change_dislikes_count
