@@ -2,7 +2,6 @@
 There are functions for working with MongoDB`s database.
 """
 
-import asyncio
 import re
 
 import motor.motor_asyncio

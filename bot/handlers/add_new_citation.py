@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import CommandStart
 from aiogram.types import Message, CallbackQuery

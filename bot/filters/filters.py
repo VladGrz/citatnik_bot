@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters import BoundFilter
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 
-from loader import bot, dp
+from loader import dp
 
 from data.database import get_user_private_setting
 

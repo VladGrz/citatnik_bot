@@ -1,4 +1,4 @@
-from aiogram.types import Message, InlineQuery, \
+from aiogram.types import InlineQuery, \
     InlineQueryResultCachedDocument, InlineQueryResultCachedVoice, \
     InlineQueryResultCachedVideo, ChosenInlineResult
 
@@ -8,6 +8,16 @@ from data.database import get_user_citat_list, get_global_citat_list, \
     increase_usages
 
 from bot.keyboards.like_dislike_kb import form_like_dislike_kb
+
+
+async def get_fake_results(start_num, citations_list, size=50):
+    if start_num >= len(citations_list):
+        return []
+    elif start_num + size >= len(citations_list):
+        return citations_list[start_num: len(citations_list)]
+    else:
+        return citations_list[start_num: start_num+size]
+
 
 
 @dp.inline_handler()
@@ -31,6 +41,11 @@ async def search_result(query: InlineQuery):
 
     # There will be all results saved to show in query result
     audio_result = []
+    if search:
+        query_offset = 0
+    else:
+        query_offset = int(query.offset) if query.offset else 1
+    for citation in await get_fake_results(query_offset, citations):
     for citation in citations:
 
         # Creating id for specific result
@@ -82,12 +97,29 @@ async def search_result(query: InlineQuery):
 
     # Switch parameter and text defines text of the inline button
     # and command which will be transferred to bot
+    if len(audio_result) < 50:
+        # If length of result is less than 50 we have no more results to show
+        # and next_offset will be empty
+        await query.answer(audio_result,
+                           cache_time=1,
+                           is_personal=True,
+                           next_offset="",
+                           switch_pm_text="Додати цитату",
+                           switch_pm_parameter='add')
+    else:
+        # If length is bigger than 50 we have to set next_offset to show them
+        await query.answer(audio_result,
+                           cache_time=1,
+                           is_personal=True,
+                           next_offset=str(query_offset+50),
+                           switch_pm_text="Додати цитату",
+                           switch_pm_parameter='add')
     await query.answer(audio_result,
                        cache_time=1,
                        is_personal=True,
                        switch_pm_text="Додати цитату",
                        switch_pm_parameter='add')
-
+    
 
 @dp.chosen_inline_handler()
 async def chosen_inline_result(chosen_result: ChosenInlineResult):

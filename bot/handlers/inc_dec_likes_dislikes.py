@@ -1,5 +1,4 @@
-from aiogram.types import CallbackQuery, InlineKeyboardButton, \
-    InlineKeyboardMarkup
+from aiogram.types import CallbackQuery
 
 from loader import dp
 
