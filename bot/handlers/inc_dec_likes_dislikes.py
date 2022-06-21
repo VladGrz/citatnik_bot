@@ -11,6 +11,7 @@ from bot.keyboards.like_dislike_kb import form_like_dislike_kb
 @dp.callback_query_handler(text_startswith="like:", state='*')
 async def set_like(call: CallbackQuery):
     """ Catching pressed `like` button"""
+
     await call.answer()
 
     # Splitting to get citation id
