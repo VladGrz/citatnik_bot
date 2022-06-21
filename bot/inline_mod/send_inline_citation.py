@@ -1,4 +1,4 @@
-from aiogram.types import Message, InlineQuery, \
+from aiogram.types import InlineQuery, \
     InlineQueryResultCachedDocument, InlineQueryResultCachedVoice, \
     InlineQueryResultCachedVideo, ChosenInlineResult
 
@@ -40,7 +40,10 @@ async def search_result(query: InlineQuery):
 
     # There will be all results saved to show in query result
     audio_result = []
-    query_offset = int(query.offset) if query.offset else 1
+    if search:
+        query_offset = 0
+    else:
+        query_offset = int(query.offset) if query.offset else 1
     for citation in await get_fake_results(query_offset, citations):
 
         # Creating id for specific result

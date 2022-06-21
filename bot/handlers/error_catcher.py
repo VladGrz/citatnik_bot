@@ -1,4 +1,3 @@
-import asyncio
 from loader import bot, dp
 
 from aiogram.types import Message, CallbackQuery, Update

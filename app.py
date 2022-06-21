@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram import executor
 
 from bot import dp
