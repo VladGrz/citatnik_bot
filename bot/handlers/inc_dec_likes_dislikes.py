@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery
 
-from loader import dp
+from loader import bot, dp
 
 from data.database import user_reaction, change_likes_count, \
     change_dislikes_count
@@ -11,6 +11,7 @@ from bot.keyboards.like_dislike_kb import form_like_dislike_kb
 @dp.callback_query_handler(text_startswith="like:", state='*')
 async def set_like(call: CallbackQuery):
     """ Catching pressed `like` button"""
+
     await call.answer()
 
     # Splitting to get citation id
