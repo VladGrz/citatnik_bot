@@ -19,6 +19,7 @@ async def get_fake_results(start_num, citations_list, size=50):
         return citations_list[start_num: start_num+size]
 
 
+
 @dp.inline_handler()
 async def search_result(query: InlineQuery):
     """ Catches inline request from user. """
@@ -45,6 +46,7 @@ async def search_result(query: InlineQuery):
     else:
         query_offset = int(query.offset) if query.offset else 1
     for citation in await get_fake_results(query_offset, citations):
+    for citation in citations:
 
         # Creating id for specific result
         hashed_id: str = str(citation['_id'])
@@ -112,6 +114,12 @@ async def search_result(query: InlineQuery):
                            next_offset=str(query_offset+50),
                            switch_pm_text="Додати цитату",
                            switch_pm_parameter='add')
+    await query.answer(audio_result,
+                       cache_time=1,
+                       is_personal=True,
+                       switch_pm_text="Додати цитату",
+                       switch_pm_parameter='add')
+    
 
 @dp.chosen_inline_handler()
 async def chosen_inline_result(chosen_result: ChosenInlineResult):
