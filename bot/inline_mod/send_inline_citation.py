@@ -46,8 +46,6 @@ async def search_result(query: InlineQuery):
     else:
         query_offset = int(query.offset) if query.offset else 1
     for citation in await get_fake_results(query_offset, citations):
-    for citation in citations:
-
         # Creating id for specific result
         hashed_id: str = str(citation['_id'])
 
