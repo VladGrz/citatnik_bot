@@ -49,7 +49,7 @@ async def delete_citation(call: CallbackQuery):
     await delete_user_citation(doc_id)
 
     # Warning user that his citation was deleted
-    await call.answer(f'Вашу цитату: "{file_name}", видалено.',
+    await call.answer(f'Вашу цитату: {file_name}, видалено.',
                       show_alert=True)
 
     # Forming new message without that citation
