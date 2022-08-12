@@ -68,3 +68,18 @@ async def commands(message: Message):
                               '/citation - викликати цитату\n'
                               '/new - створити нову цитату\n'
                               '/delete_citation - видалити цитату\n')
+
+
+@dp.message_handler(commands=["?"])
+async def invert(message: Message):
+    message_text = message.reply_to_message.text
+    en = "qwertyuiop[]asdfghjkl;'zxcvbnm,./"
+    ua = "йцукенгшщзхїфівапролджєячсмитьбю."
+    if message_text[0] in en:
+        for i in message_text:
+            message_text = message_text.replace(i, ua[en.index(i)])
+    else:
+        for i in message_text:
+            message_text = message_text.replace(i, en[ua.index(i)])
+    await message.reply_to_message.answer(message_text)
+    await message.delete()
