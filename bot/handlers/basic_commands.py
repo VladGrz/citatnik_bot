@@ -88,5 +88,5 @@ async def invert(message: Message):
             except ValueError:
                 pass
     print(message_text)
-    await message.reply_to_message.answer(message_text)
+    await message.reply_to_message.answer(message_text, reply=True)
     await message.delete()
