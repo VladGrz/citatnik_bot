@@ -77,9 +77,16 @@ async def invert(message: Message):
     ua = "йцукенгшщзхїфівапролджєячсмитьбю."
     if message_text[0] in en:
         for i in message_text:
-            message_text = message_text.replace(i, ua[en.index(i)])
+            try:
+                message_text = message_text.replace(i, ua[en.index(i)])
+            except ValueError:
+                pass
     else:
         for i in message_text:
-            message_text = message_text.replace(i, en[ua.index(i)])
+            try:
+                message_text = message_text.replace(i, en[ua.index(i)])
+            except ValueError:
+                pass
+    print(message_text)
     await message.reply_to_message.answer(message_text)
     await message.delete()
